@@ -204,7 +204,3 @@ smartctl -A /dev/$disk >> results/$model
 smartctl -l error /dev/$disk >> results/$model
 
 rm run-orion
-################################===THE END===################################
-
-
-
