@@ -66,7 +66,7 @@ light_down_slot &
 #############################===SMART_TEST===###############################
 smart_test ()                                                                                 # collects SMART arttributes and writes them in var
 {
-smartctl -A -H -i -a $(readlink -f $1) | fgrep -v '===' | awk '
+smartctl -A -H -i -a $(readlink -f $block_dev) | fgrep -v '===' | awk '
 /Device Model/{ model=$3$4 }
 /Power_On_Hours/{ poh=$10 }
 /Serial [Nn]umber:/ { serial=$3 }
@@ -89,22 +89,22 @@ END {
 erase ()                                                                                       # erase partition table
  
 {
-fdisk /dev/$1 <<EOF
+fdisk /dev/$block_dev <<EOF
 o
 w
 EOF
  
-sectors=$(($(fdisk -s /dev/$1)-102400)) 
+sectors=$(($(fdisk -s /dev/$block_dev)-102400)) 
  
-dd if=/dev/zero of=/dev/$1 bs=1M count=100
-dd if=/dev/zero of=/dev/$1 bs=1k seek=$sectors count=102400
+dd if=/dev/zero of=/dev/$block_dev bs=1M count=100
+dd if=/dev/zero of=/dev/$block_dev bs=1k seek=$sectors count=102400
 }
 
 #############################===MAIN===#####################################
 main ()                                                                                       # check drive for SMART attributes and highligh it
                                                                                               # as FAILED or VALID
 {
-eval `smart_test /dev/$1` 
+eval `smart_test /dev/$block_dev` 
 
 data=$(echo "MODEL="$model"&SERIAL_NUM="$serial"&POH="$poh"&READ_ERROR_RATE="$read_error"&CURRENT_PEND=""$pend""&REALLOC=""$rsec""&OFFLINE_UNC=""$offunc""&REALL_EVENT=""$revent""&HEALTH="$health"&ATA_ERROR="$ata_err)
 
@@ -113,11 +113,12 @@ if [ $rsec -gt 4 -o $pend -gt 10 -o $offunc -gt 10 -o $revent -gt 10 -o  $health
    sleep 3
       curl -v -d "RESULT=FAILED&$data" $SERVER 
         sg_ses --index="$slot" --set=3:5=1 "$expander"
-         exit 1
+         erase $block_dev
+          exit 1
 else
    curl -v -d "RESULT=VALID&$data" $SERVER 
-   sg_ses --index="$slot" --set=2:1=1 "$expander"
-    exit 0
+    sg_ses --index="$slot" --set=2:1=1 "$expander"
+     exit 0
 fi 2>/dev/null
 
 }
@@ -138,7 +139,7 @@ sleep 15                                                                        
 
 error_msg=$(dmesg | grep $block_dev | grep -i error)                                          # if device has errors at start
 
-  eval `smart_test /dev/$1`
+  eval `smart_test /dev/$block_dev`
  
   data=$(echo "MODEL="$model"&SERIAL_NUM="$serial"&POH="$poh"&READ_ERROR_RATE="$read_error"&CURRENT_PEND=""$pend""&REALLOC=""$rsec""&OFFLINE_UNC=""$offunc""&REALL_EVENT=""$revent""&HEALTH="$health"&ATA_ERROR="$ata_err) 
    
@@ -149,7 +150,8 @@ if [ -z "$block_dev" ]; then 			                                              # 
 elif [ -n "$error_msg" ]; then                                                                # looking for errors in dmesg
     curl -v -d "RESULT=FAILED&"$data"&REASON=ERRORS_IN_DMESG" $SERVER 
      sg_ses --index="$slot" --set=3:5=1 "$expander"
-      exit 1
+      erase $block_dev
+       exit 1
 else
     main $block_dev                                                                           # starts main test, it means that device has block name, and doesn't have 
                                                                                               #errors
