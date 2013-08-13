@@ -84,6 +84,23 @@ END {
 }' | sed 's/,//g' 2>/dev/null
 }
 
+#############################===ERASE===#####################################
+
+erase ()                                                                                       # erase partition table
+ 
+{
+fdisk /dev/$1 <<EOF
+o
+w
+EOF
+ 
+sectors=$(($(fdisk -s /dev/$1)-102400)) 
+ 
+dd if=/dev/zero of=/dev/$1 bs=1M count=100
+dd if=/dev/zero of=/dev/$1 bs=1k seek=$sectors count=102400
+}
+
+#############################===MAIN===#####################################
 main ()                                                                                       # check drive for SMART attributes and highligh it
                                                                                               # as FAILED or VALID
 {
@@ -104,7 +121,8 @@ else
 fi 2>/dev/null
 
 }
-#############################===MAIN===#####################################
+
+#############################===PRE-MAIN===#####################################
 
 test_fn ()
 {
@@ -155,7 +173,7 @@ export -f test_fn
 export -f main
 export -f lock_fn
 export -f smart_test
-
+export -f erase
 
 inotifywait -mr -e create /dev/  | while read line; do lock_fn $(echo $line | grep -o -E sg[0-9]+ ) ;done 
 
