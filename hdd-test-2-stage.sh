@@ -1,8 +1,8 @@
 #!/bin/bash
 
 expander=$(sg_map -x | awk '{if ( $6 == 13 ) { print $1 }}')
-api_url="http://$SERVER_NAME
-"
+api_url="http://$SERVER_NAME"
+
 max_pend=10    # Maximum Pending sectors
 max_offunc=10  # Maximum Offline UNC errors
 max_revent=10  # Maximim Reallocetedents
