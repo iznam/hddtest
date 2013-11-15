@@ -15,9 +15,9 @@ export expander
 export api_url max_pend max_offunc max_revent max_rsect
 
 if [ -z $expander ]; then
-  echo "++++++++++++++++++++++++++++++++++++++++++++++++"
-  echo "JBOD is apsent, please connect one to this server"
-  echo "++++++++++++++++++++++++++++++++++++++++++++++++"
+  echo "++++++++++++++++++++++++++++++++++++++++++++++++++"
+  echo "JBOD is absent, please connect JBOD to this server"
+  echo "++++++++++++++++++++++++++++++++++++++++++++++++++"
   exit 1
 fi 
 
