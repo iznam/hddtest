@@ -2,7 +2,8 @@
 
 ######################################
 # One test takes 14 hours:           #
-# 8 hours for FIO, 10 hours for Orion# 
+# 8 hours for FIO, 10 hours for Orio #
+# Orion OEACLE is Required           #
 ######################################
 
 while getopts "d:f:h" arg
