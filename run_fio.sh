@@ -61,6 +61,6 @@ runtime=$time" > work_file.dat
 
 #one_drive $block $disk $operation $qd $time
 
-fio work_file.dat
+fio work_file.dat > res_file.dat
 
 rm work_file.dat
