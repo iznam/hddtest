@@ -29,7 +29,7 @@ echo " "
 echo $1
 echo " "
 echo "Usage: $0 [OPTIONS]
--d [disk name, e.g. sda] 
+-d [disk name, e.g. /dev/sda] 
 -o [operation type, seq. read/write, random read/write, default random read] 
 -t [test duration, default 300 seconds] 
 -q [queue depth, default 1] 
@@ -50,7 +50,7 @@ exit 1
 echo "
 [fio_test]
 blocksize=$block
-filename=/dev/$disk
+filename=$disk
 rw=$operation
 direct=1
 buffered=0
@@ -61,6 +61,6 @@ runtime=$time" > work_file.dat
 
 #one_drive $block $disk $operation $qd $time
 
-fio work_file.dat > res_file.dat
+fio work_file.dat > res_${disk/\/dev\//}.dat
 
 rm work_file.dat
