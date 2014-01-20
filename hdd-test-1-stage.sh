@@ -9,7 +9,7 @@ set -e
 	max_offunc=10  # Maximum Offline UNC errors
 	max_revent=10  # Maximim Realloceted events
 	max_rsect=3     # Maximim Reallocated sectors (Bad blocks)
-	max_read_err=2 # Maximum Rear Raw errors (for WD and Hitachi only)
+	max_read_err=2 # Maximum Read Raw errors (for WD and Hitachi only)
 
 	export expander
 	export api_url max_pend max_offunc max_revent max_rsect
